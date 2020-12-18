@@ -22,6 +22,13 @@ func WithSeconds() Option {
 	))
 }
 
+// WithNowTimeGetter overrides the default time.Now getter with your now time function
+func WithNowTimeGetter(getter NowTimeGetter) Option {
+	return func(c *Cron) {
+		c.nowTimeGetter = getter
+	}
+}
+
 // WithParser overrides the parser used for interpreting job schedules.
 func WithParser(p ScheduleParser) Option {
 	return func(c *Cron) {

@@ -7,23 +7,26 @@ import (
 	"time"
 )
 
+type NowTimeGetter func() time.Time
+
 // Cron keeps track of any number of entries, invoking the associated func as
 // specified by the schedule. It may be started, stopped, and the entries may
 // be inspected while running.
 type Cron struct {
-	entries   []*Entry
-	chain     Chain
-	stop      chan struct{}
-	add       chan *Entry
-	remove    chan EntryID
-	snapshot  chan chan []Entry
-	running   bool
-	logger    Logger
-	runningMu sync.Mutex
-	location  *time.Location
-	parser    ScheduleParser
-	nextID    EntryID
-	jobWaiter sync.WaitGroup
+	entries       []*Entry
+	chain         Chain
+	stop          chan struct{}
+	add           chan *Entry
+	remove        chan EntryID
+	snapshot      chan chan []Entry
+	running       bool
+	logger        Logger
+	runningMu     sync.Mutex
+	location      *time.Location
+	parser        ScheduleParser
+	nextID        EntryID
+	jobWaiter     sync.WaitGroup
+	nowTimeGetter NowTimeGetter
 }
 
 // ScheduleParser is an interface for schedule spec parsers that return a Schedule
@@ -315,6 +318,11 @@ func (c *Cron) startJob(j Job) {
 
 // now returns current time in c location
 func (c *Cron) now() time.Time {
+
+	if c.nowTimeGetter != nil {
+		return c.nowTimeGetter()
+	}
+
 	return time.Now().In(c.location)
 }
 

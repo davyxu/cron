@@ -9,6 +9,16 @@ type SpecSchedule struct {
 
 	// Override location for this schedule.
 	Location *time.Location
+
+	context interface{}
+}
+
+func (s *SpecSchedule) SetContext(ctx interface{}) {
+	s.context = ctx
+}
+
+func (s *SpecSchedule) GetContext() interface{} {
+	return s.context
 }
 
 // bounds provides a range of acceptable values (plus a map of name to value).
